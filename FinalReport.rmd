@@ -22,3 +22,130 @@ FinalData <- OldData %>% mutate(infected = recode(infected, aids = "covid", none
 
 A new  preventative vaccine (covid91) is under test in clinical trials. Given the nature of this vaccine it is suspected that the drug may exhibit different effectiveness across the variety of subpopulations tracked. Consider population subgroups consisting of Males, Females, just the drug users, and just those in the LGBTQ community. Write a complete report that separately considers this drug for each subgroup and your recommendations as to whether people in the subgroup should take the vaccine. Structure your report in four sections each devoted to one of the four subgroups, use null and alternative hypothesis statements and correct statistical verbage when referencing p-values in conclusions.
 
+
+The first step is to isolate the subpopulations of Male, Females, Drug Users, and LGBTQ.
+
+# Males
+
+```{r}
+Maledata<-filter(FinalData,sex=="guy")
+Maledata$sex<-as.factor(Maledata$sex)
+Maledata$infected=factor(Maledata$infected)
+Maledata$infected<-relevel(Maledata$infected,"OK")
+```
+
+## Barchart
+
+```{r}
+Males <- Maledata %>% group_by(infected, treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(Males,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+#Now for percentage plot
+
+basicCC <- ggplot(Males,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+
+This barchart shows that out of the approximately 340 Males who were infected with Covid 57% were given the drug, and 43% were give the placebo.
+
+## Numerical Summaries  
+
+```{r}
+table1 <- xtabs(~treatment + infected, data=Maledata)
+rowPerc(table1)
+colPerc(table1)
+print(table1)
+```
+
+the table shows that about 340 Males were infected with Covid out of approximately 10,400 Males in the study. The table also shows that 3.72% of Males who received the drug contracted Covid and 2.55% who received the placebo contracted Covid. The table also shows that males who got the cavvine were about 50% more likely to contract Covid, meaning the vaccine is not effective for males.
+
+## Inferential  
+
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+```
+
+The p-value is so small at 0.0006181 that it is highly unlikely that the results were by chance.
+
+$H_0$ the null hypothesis is that the vaccine makes no difference in the male population whe it comes to contracting Covid-19.
+
+$H_0$ the alternative hypothesis is that the vaccine in fact does make a difference in whether or not  a male contracts Covid.
+
+Therefore, we reject the null hypotheseis.
+
+The fisher Exact Test odds ration is 1.47:1, when taking the odds ratio and computing it into a percent of the effectiveness by using the formula 0/(1-0)*100 you get 59.53 effectiveness.
+
+The vaccine is 40% effective in the male population, which is ineffective.
+
+
+# Females
+
+```{r}
+Femaledata<-filter(FinalData,sex=="gal")
+Femaledata$sex<-as.factor(Femaledata$sex)
+Femaledata$infected=factor(Femaledata$infected)
+Femaledata$infected<-relevel(Femaledata$infected,"OK")
+levels(Femaledata$infected)
+```
+
+## Barchart
+
+```{r}
+Females <- Femaledata %>% group_by(infected, treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(Females,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+#Now for percentage plot
+
+basicCC <- ggplot(Females,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+This barchart shows that out of the approximately 607 females who were infected with Covid, 32% were given the drug and 66% were given the placebo.
+
+
+## Numerical Summaries  
+
+```{r}
+table2 <- xtabs(~treatment + infected, data=Femaledata)
+rowPerc(table2)
+colPerc(table2)
+print(table2)
+```
+
+the table shows that about 607 females were infected with Covid out of approximately 9.200 females in the study. The table also shows that 4.44% of females who received the drug contracted Covid and 8.67% who received the placebo contracted Covid. The table also shows that males who got the vaccine were about 67% less likely to contract Covid, meaning the vaccine is effective for females.
+
+
+
+## Inferential  
+
+```{r}
+chisq.test(table2)
+chisqtestGC(table2)
+fisher.test(table2)
+```
+
+The p-value is so small that it is highly unlikely that the results were by chance.
+
+  $H_0$ The null hypothesis is that the vaccine makes no difference  in the female population when it comes to contracting Covid-19.
+  $H_0$ the alternative hypothesis is that the vaccine in fact makes a difference in whether or not a female contracts Covid.
+  
+Therefore, we reject the null hypothesis.
+
+The Fisher Exact Test odds ratio is 2.05:1, when taking the odds ration and computing it into a percent of effectiveness by using the formula 0/(1-0)*100 you get 67% effectiveness.
+
+Ultimately the vaccine is 67% effective in the female population, which is absolutely effective.
+
+
