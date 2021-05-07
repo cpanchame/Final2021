@@ -140,6 +140,7 @@ fisher.test(table2)
 The p-value is so small that it is highly unlikely that the results were by chance.
 
   $H_0$ The null hypothesis is that the vaccine makes no difference  in the female population when it comes to contracting Covid-19.
+  
   $H_0$ the alternative hypothesis is that the vaccine in fact makes a difference in whether or not a female contracts Covid.
   
 Therefore, we reject the null hypothesis.
@@ -149,3 +150,135 @@ The Fisher Exact Test odds ratio is 2.05:1, when taking the odds ration and comp
 Ultimately the vaccine is 67% effective in the female population, which is absolutely effective.
 
 
+# Drug Users
+
+# Method
+
+```{r}
+druguserdata<-filter(FinalData,DrugUser=="yes")
+druguserdata$sex<-as.factor(druguserdata$sex)
+druguserdata$infected=factor(druguserdata$infected)
+druguserdata$infected<-relevel(druguserdata$infected,"OK")
+```
+
+
+## Barchart
+
+```{r}
+DrugUser <- druguserdata %>% group_by(infected, treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(DrugUser,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+#Now for percentage plot
+
+basicCC <- ggplot(DrugUser,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+This barchart shows that out of the approximately 117 DrugUsers who were infected with Covid, 32% were given the drug and 66% were given the placebo.
+
+
+
+## Numerical Summaries  
+
+```{r}
+table3 <- xtabs(~treatment + infected, data=druguserdata)
+rowPerc(table3)
+colPerc(table3)
+print(table3)
+```
+
+the table shows that about 117 DrugUsers were infected with Covid out of approximately 2,280 DrugUsers in the study. The table also shows that 33.3% of DrugUser who received the drug contracted Covid and 66.6% who received the placebo contracted Covid. The table also shows that DrugUsers who got the vaccine were about 60% less likely to contract Covid, meaning the vaccine is effective for DrugUsers.
+
+
+
+## Inferential  
+
+```{r}
+chisq.test(table3)
+chisqtestGC(table3)
+fisher.test(table3)
+```
+
+The p-value is so small at 0.002273 that is highlyunlikely that the results were by chance.
+
+$H_0$ the null hypothesis is that the vaccine makes no difference in the DrugUser population when it comes to contracting Covid-19.
+
+Therefore, we reject the null hypothesis.
+
+The Fisher Exact Test odds ratio is 1.83:1 when taking the odds ratio and computing it into a percent of effectiveness by using the formula 0/(1-0)*100 you get 60% effectiveness.
+
+
+
+# LGBTQ
+
+# Method
+
+```{r}
+LGBTQdata<-filter(FinalData,LGBTQ=="gay")
+LGBTQdata$sex<-as.factor(LGBTQdata$sex)
+LGBTQdata$infected=factor(LGBTQdata$infected)
+LGBTQdata$infected<-relevel(LGBTQdata$infected,"OK")
+```
+
+## Barchart
+
+```{r}
+LGBTQ <- LGBTQdata %>% group_by(infected, treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(LGBTQ,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+#Now for percentage plot
+
+basicCC <- ggplot(LGBTQ,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+This barchart shows that out of the approximately 110 LGBTQ who were infected with Covid, 70% were given the drug and 29% were given the placebo.
+
+
+## Numerical Summaries  
+
+```{r}
+table4 <- xtabs(~treatment + infected, data=LGBTQdata)
+rowPerc(table4)
+colPerc(table4)
+print(table4)
+```
+
+the table shows that about 166 LGBTQ were infected with Covid out of approximately 2040 LGBTQ in the study. The table also shows that 70% of LGBTQ who received the drug contracted Covid and 29% who received the placebo contracted Covid. The table also shows that LGBTQ who got the vaccine were about 29% more likely to contract Covid, meaning the vaccine is ineffective for the LGBTQ population.
+
+
+
+## Inferential  
+
+```{r}
+chisq.test(table4)
+chisqtestGC(table4)
+fisher.test(table4)
+```
+
+The p-value is so small that it is highly unlikely that the results were by chance.
+
+  $H_0$ The null hypothesis is that the vaccine makes no difference  in the LGBTQ population when it comes to contracting Covid-19.
+  
+  $H_0$ the alternative hypothesis is that the vaccine in fact makes a difference in whether or not a LGBTQ contracts Covid.
+  
+Therefore, we reject the null hypothesis.
+
+The Fisher Exact Test odds ratio is 0.40:1, when taking the odds ration and computing it into a percent of effectiveness by using the formula 0/(1-0)*100 you get 29% effectiveness.
+
+Ultimately the vaccine is 29% effective in the LGBTQ population, which is absolutely ineffective.
+
+
+# Discussion and Conclusion
+
+When looking at the 4 populations, we found that the two populations that had the highest rate of effectiveness were the Females at 67% and the DrugUsers at 60%. Both the male population and the LGBTQ populations showed that the vaccine was not benifical to them and were ineffective in protecting them for contracting Covid-19, the Males had a 40% effectiveness, while the LGBTQ had 29% effectiveness, which is not at all effective.
